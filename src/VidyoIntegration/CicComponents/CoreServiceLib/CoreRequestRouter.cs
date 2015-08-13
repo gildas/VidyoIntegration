@@ -8,6 +8,9 @@ using VidyoIntegration.TraceLib;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Routing;
+using Nancy.Extensions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using VidyoIntegration.CommonLib.CicTypes;
 using VidyoIntegration.CommonLib.CicTypes.RequestClasses;
 using VidyoIntegration.CommonLib.CicTypes.TransportClasses;
@@ -17,6 +20,8 @@ using VidyoIntegration.CommonLib.VidyoTypes.RequestClasses;
 using VidyoIntegration.ConversationManagerLib;
 using Timer = System.Timers.Timer;
 using Trace = VidyoIntegration.CommonLib.Trace;
+using System.IO;
+using VidyoIntegration.CommonLib.CicTypes.Serializers;
 
 namespace VidyoIntegration.CoreServiceLib
 {
@@ -38,7 +43,40 @@ namespace VidyoIntegration.CoreServiceLib
                     {
                         UpdateCount("post /conversations");
 
-                        var request = this.Bind<CreateConversationRequest>();
+                        CreateConversationRequest request = null;
+
+                        try
+                        {
+                            request = this.Bind<CreateConversationRequest>();
+                        }
+                        catch(System.Reflection.TargetInvocationException e)
+                        {
+                            Trace.WriteEventError(e, "Cannot bind the Create Conversation Request" + e.Message, EventId.GenericError);
+                            /*
+InnerException	{"Cannot create an abstract class."}
+StackTrace:
+at System.RuntimeTypeHandle.CreateInstance(RuntimeType type, Boolean publicOnly, Boolean noCheck, Boolean& canBeCached, RuntimeMethodHandleInternal& ctor, Boolean& bNeedSecurityCheck)\r\n
+at System.RuntimeType.CreateInstanceSlow(Boolean publicOnly, Boolean skipCheckThis, Boolean fillCache, StackCrawlMark& stackMark)\r\n
+at System.RuntimeType.CreateInstanceDefaultCtor(Boolean publicOnly, Boolean skipCheckThis, Boolean fillCache, StackCrawlMark& stackMark)\r\n
+at System.Activator.CreateInstance(Type type, Boolean nonPublic)\r\n
+at Nancy.Json.JavaScriptSerializer.ConvertToObject(IDictionary`2 dict, Type type)\r\n
+at Nancy.Json.JavaScriptSerializer.ConvertToType(Type type, Object obj)\r\n
+at Nancy.Json.JavaScriptSerializer.ConvertToObject(IDictionary`2 dict, Type type)\r\n
+at Nancy.Json.JavaScriptSerializer.ConvertToType(Type type, Object obj)\r\n
+at Nancy.Json.JavaScriptSerializer.ConvertToType[T](Object obj)\r\n
+at Nancy.Json.JavaScriptSerializer.Deserialize[T](String input)
+                             */
+                        }
+
+                        if (request == null)
+                        {
+                            Request.Body.Seek(0, SeekOrigin.Begin);
+                            var content  = Request.Body.AsString();
+                            var settings = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver(), Formatting = Formatting.Indented };
+
+                            settings.Converters.Add(new MediaTypeParametersJsonConverter());
+                            request = JsonConvert.DeserializeObject<CreateConversationRequest>(content, settings);
+                        }
 
                         #region Validation
 
