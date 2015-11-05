@@ -57,7 +57,10 @@ namespace VidyoIntegration.VidyoAddin.ViewModel
             VideoIntegrationAttributeNames.VideoConversationId,
             VideoIntegrationAttributeNames.VideoLastAgentToScreenPop,
             VideoIntegrationAttributeNames.VideoRoomId,
-            VideoIntegrationAttributeNames.VideoRoomUrl
+            VideoIntegrationAttributeNames.VideoRoomUrl,
+            VideoIntegrationAttributeNames.VideoRoomName,
+            VideoIntegrationAttributeNames.VideoRoomExtension,
+            VideoIntegrationAttributeNames.VideoRoomPin
         };
 
         private ObservableCollection<InteractionViewModel> _interactions;

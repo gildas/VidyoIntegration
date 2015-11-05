@@ -63,6 +63,30 @@ namespace VidyoIntegration.VidyoAddin.ViewModel
             }
         }
 
+        public string VidyoRoomName
+        {
+            get
+            {
+                return _interaction.GetWatchedStringAttribute(VideoIntegrationAttributeNames.VideoRoomName);
+            }
+        }
+
+        public string VidyoRoomExtension
+        {
+            get
+            {
+                return _interaction.GetWatchedStringAttribute(VideoIntegrationAttributeNames.VideoRoomExtension);
+            }
+        }
+
+        public string VidyoRoomPin
+        {
+            get
+            {
+                return _interaction.GetWatchedStringAttribute(VideoIntegrationAttributeNames.VideoRoomPin);
+            }
+        }
+
         public string VidyoRoomUrl
         {
             get
