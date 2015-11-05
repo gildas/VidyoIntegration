@@ -626,6 +626,50 @@ namespace VidyoIntegration.VidyoAddin.ViewModel
             }
         }
 
+        private void SendSMS(string remoteName, string remoteNumber, string message)
+        {
+            using(Trace.Main.scope())
+            {
+                try
+                {
+                    InteractionsManager manager = InteractionsManager.GetInstance(_session);
+                    QueueId queue = new QueueId(QueueType.User, _session.UserId);
+                    GenericInteractionParameters parameters = new GenericInteractionParameters(queue, InteractionState.Connected);
+
+                    parameters.InteractionDirection = InteractionDirection.Outgoing;
+                    parameters.LocalLocation = string.Empty;
+                    parameters.LocalPartyType = InteractionPartyType.Internal;
+                    parameters.RemoteName = remoteName;
+                    parameters.RemotePartyType = InteractionPartyType.External;
+                    parameters.RemoteId = remoteNumber;
+                    parameters.AdditionalAttributes.Add("Eic_InteractionType", "SMSObject");
+                    parameters.AdditionalAttributes.Add("Eic_SMS_Texts", message);
+
+                    manager.MakeGenericInteractionAsync(parameters, OnSendSMSCompleted, null);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    Trace.Main.exception(ex, ex.Message);
+                }
+            }
+        }
+
+        private void OnSendSMSCompleted(object sender, MakeGenericInteractionCompletedEventArgs e)
+        {
+            if (e.Error != null)
+            {
+                if (e.GenericInteraction != null)
+                {
+                    Trace.Main.exception(e.Error, "Failure while sending SMS to {} (interaction={})", e.GenericInteraction.RemoteId, e.GenericInteraction.InteractionId);
+                }
+                else
+                {
+                    Trace.Main.exception(e.Error, "Failure while sending SMS");
+                }
+            }
+        }
+
         #endregion
 
 
