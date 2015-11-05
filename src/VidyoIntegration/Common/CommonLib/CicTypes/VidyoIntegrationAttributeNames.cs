@@ -10,5 +10,8 @@ namespace VidyoIntegration.CommonLib.CicTypes
         public const string VideoAttributePrefix = "Video_";
         public const string VideoAutoAnswerOnReconstitution = "Video_AutoAnswerOnReconstitution";
         public const string VideoRoomUrl = "Video_RoomUrl";
+        public const string VideoRoomName = "Video_RoomName";
+        public const string VideoRoomExtension = "Video_RoomExtension";
+        public const string VideoRoomPin = "Video_RoomPin";
     }
 }
