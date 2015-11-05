@@ -18,6 +18,8 @@ namespace VidyoIntegration.VidyoAddin.View
     public partial class VidyoInteractionDisplayPanel : UserControl, INotifyPropertyChanged
     {
         private string _guestName;
+        private string _guestSMSNumber;
+
         public VidyoPanelViewModel VidyoPanelViewModel { get { return VidyoPanelViewModel.Instance; } }
 
         private InteractionViewModel Interaction { get { return DataContext as InteractionViewModel; } }
@@ -35,6 +37,18 @@ namespace VidyoIntegration.VidyoAddin.View
 
         public bool HasGuestName { get { return !string.IsNullOrEmpty(GuestName); } }
 
+        public string GuestSMSNumber
+        {
+            get { return _guestSMSNumber; }
+            set
+            {
+                _guestSMSNumber = value;
+                OnPropertyChanged();
+                OnPropertyChanged("HasGuestSMSNumber");
+            }
+        }
+
+        public bool HasGuestSMSNumber { get { return !string.IsNullOrEmpty(GuestSMSNumber); } }
 
         public VidyoInteractionDisplayPanel()
         {
@@ -162,6 +176,20 @@ namespace VidyoIntegration.VidyoAddin.View
             {
                 Clipboard.SetText(Interaction.VidyoRoomUrl + "&guestName=" + HttpUtility.UrlEncode(GuestName.Trim()));
                 GuestName = "";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Trace.Main.exception(ex);
+            }
+        }
+
+        private void SendSMS_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                VidyoPanelViewModel.Instance.SMSInviteToConference(Interaction, GuestSMSNumber, "Please join my conference");
+                GuestSMSNumber = "";
             }
             catch (Exception ex)
             {

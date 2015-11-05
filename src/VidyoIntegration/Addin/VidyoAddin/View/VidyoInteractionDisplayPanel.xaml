@@ -64,6 +64,43 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="SendSMSButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="IsEnabled" Value="False" />
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid x:Name="Chrome" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#ADADAD"/>
+                                <Setter Property="Opacity" TargetName="Chrome" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <ImageBrush TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Center" ImageSource="pack://siteoforigin:,,,/addins/img/mobile.png" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ToolTip" Value="Send SMS" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=TheWindow, Path=HasGuestSMSNumber}" Value="True">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="TransferButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="IsEnabled" Value="{Binding HasTransferTarget}" />
             <Setter Property="BorderThickness" Value="1"/>
@@ -414,6 +451,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Interaction Id" />
@@ -437,8 +475,17 @@
                 <TextBox Text="{Binding ElementName=TheWindow, Path=GuestName, UpdateSourceTrigger=PropertyChanged}" />
             </DockPanel>
 
-            <TextBlock Grid.Row="5" Grid.Column="0" Text="Invite from directory" />
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Invite via SMS" />
             <DockPanel Grid.Row="5" Grid.Column="1">
+                <Button DockPanel.Dock="Right" VerticalAlignment="Center" Width="16" Height="16" 
+                    Margin="3,0" Click="SendSMS_OnClick"
+                    Style="{StaticResource SendSMSButtonStyle}" />
+                <TextBlock DockPanel.Dock="Left" Text="Guest number:" />
+                <TextBox Text="{Binding ElementName=TheWindow, Path=GuestSMSNumber, UpdateSourceTrigger=PropertyChanged}" />
+            </DockPanel>
+
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Invite from directory" />
+            <DockPanel Grid.Row="6" Grid.Column="1">
                 <Button DockPanel.Dock="Right" VerticalAlignment="Center" Width="16" Height="16" 
                     Margin="3,0" Style="{StaticResource TransferButtonStyle}" Click="Transfer_OnClick" />
                 <Button DockPanel.Dock="Right" VerticalAlignment="Center" Width="16" Height="16" 
@@ -451,8 +498,8 @@
                 </Grid>
             </DockPanel>
 
-            <TextBlock Grid.Row="6" Grid.Column="0" Text="Participants" />
-            <ItemsControl Grid.Row="6" Grid.Column="1" ItemsSource="{Binding Path=Participants}">
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Participants" />
+            <ItemsControl Grid.Row="7" Grid.Column="1" ItemsSource="{Binding Path=Participants}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="transportClasses:Participant">
                         <Border BorderThickness="1" BorderBrush="LightGray" CornerRadius="2" Padding="3" Margin="1">
@@ -504,7 +551,7 @@
             </ItemsControl>
             
             <!-- TODO: Delete this, for debugging only -->
-            <Grid Width="8" Height="8" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="7" Grid.Column="1">
+            <Grid Width="8" Height="8" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="8" Grid.Column="1">
                 <Grid.Style>
                     <Style TargetType="Grid">
                         <Setter Property="Background" Value="LightGray" />

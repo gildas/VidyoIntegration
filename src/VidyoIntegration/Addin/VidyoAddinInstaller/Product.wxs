@@ -78,6 +78,7 @@
       <Component Id="AddinImages" Guid="FCED64BD-DC6A-478E-B12D-6704D19A604E" Directory="ADDINIMAGES">
         <File Id="add.png" Name="add.png" Source="..\VidyoAddin\bin\Release\img\add.png" Vital="yes" KeyPath="no" DiskId="1"/>
         <File Id="documents.png" Name="documents.png" Source="..\VidyoAddin\bin\Release\img\documents.png" Vital="yes" KeyPath="no" DiskId="1"/>
+        <File Id="mobile.png" Name="mobile.png" Source="..\VidyoAddin\bin\Release\img\mobile.png" Vital="yes" KeyPath="no" DiskId="1"/>
         <File Id="sign_warning.png" Name="sign_warning.png" Source="..\VidyoAddin\bin\Release\img\sign_warning.png" Vital="yes" KeyPath="no" DiskId="1"/>
         <File Id="webcam_add.png" Name="webcam_add.png" Source="..\VidyoAddin\bin\Release\img\webcam_add.png" Vital="yes" KeyPath="no" DiskId="1"/>
       </Component>

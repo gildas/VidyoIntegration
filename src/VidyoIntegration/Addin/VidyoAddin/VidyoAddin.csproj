@@ -150,6 +150,9 @@
     <Content Include="img\documents.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="img\mobile.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="img\sign_warning.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
