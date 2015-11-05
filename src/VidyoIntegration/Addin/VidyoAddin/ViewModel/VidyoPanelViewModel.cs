@@ -853,6 +853,28 @@ namespace VidyoIntegration.VidyoAddin.ViewModel
             }
         }
 
+        public void SMSInviteToConference(InteractionViewModel interaction, string smsNumber, string message)
+        {
+            using (Trace.Main.scope())
+            {
+                try
+                {
+                    if (interaction == null)                  throw new ArgumentNullException("interaction");
+                    if (string.IsNullOrWhiteSpace(smsNumber)) throw new ArgumentNullException("smsNumber");
+
+                    var builder = new StringBuilder();
+
+                    Trace.Main.note("Room: id={}, name={}, extension={}, pin={}", interaction.VidyoRoomId, interaction.VidyoRoomName, interaction.VidyoRoomExtension, interaction.VidyoRoomPin);
+                    builder.AppendLine(message).Append("Room Extension: ").Append(interaction.VidyoRoomExtension).Append(", PIN: ").Append(interaction.VidyoRoomPin);
+                    SendSMS(smsNumber, smsNumber, builder.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    Trace.Main.exception(ex, ex.Message);
+                }
+            }
+        }
         #endregion
     }
 }
