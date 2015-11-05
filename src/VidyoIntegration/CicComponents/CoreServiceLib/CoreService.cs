@@ -484,6 +484,12 @@ namespace VidyoIntegration.CoreServiceLib
                         conversation.Room.RoomId.ToString();
                     videoParameters.AdditionalAttributes[VideoIntegrationAttributeNames.VideoRoomUrl] =
                         conversation.RoomUrl;
+                    videoParameters.AdditionalAttributes[VideoIntegrationAttributeNames.VideoRoomName] =
+                        conversation.Room.Name;
+                    videoParameters.AdditionalAttributes[VideoIntegrationAttributeNames.VideoRoomExtension] =
+                        conversation.Room.Extension;
+                    videoParameters.AdditionalAttributes[VideoIntegrationAttributeNames.VideoRoomPin] =
+                        conversation.Room.Pin;
 
                     // Create interaction
                     conversation.InteractionId = _cic.MakeInteraction(videoParameters);
