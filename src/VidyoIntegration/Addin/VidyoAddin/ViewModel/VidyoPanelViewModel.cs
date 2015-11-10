@@ -626,6 +626,43 @@ namespace VidyoIntegration.VidyoAddin.ViewModel
             }
         }
 
+        void OnTinyUrlGenerated(object sender, System.Net.DownloadDataCompletedEventArgs e)
+        {
+            using (Trace.Main.scope())
+            {
+                if (e.Error != null)
+                {
+                    var remote = (e.UserState as string[])[0];
+
+                    Trace.Main.exception(e.Error, "Could not generate a tiny URL while inviting {}", remote);
+                    MessageBox.Show(string.Format("Failed to invite {0}", remote),
+                        "Video conference invitation failed",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Exclamation,
+                        MessageBoxResult.OK);
+                }
+                else
+                {
+                    try
+                    {
+                        var tinyUrl    = System.Text.Encoding.Default.GetString(e.Result);
+                        var remote     = (e.UserState as string[])[0];
+                        var message    = (e.UserState as string[])[1];
+                        var pin        = (e.UserState as string[])[2];
+                        var smsMessage = string.Format("{0}\n{1}, PIN: {2}", message, tinyUrl, pin);
+                        Trace.Main.verbose("Tiny URL received: {}", tinyUrl);
+                        Trace.Main.verbose("Sending SMS Text: \"{}\" to {}", smsMessage, remote);
+                        SendSMS(remote, remote, smsMessage);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                        Trace.Main.exception(ex, ex.Message);
+                    }
+                }
+            }
+        }
+
         private void SendSMS(string remoteName, string remoteNumber, string message)
         {
             using(Trace.Main.scope())
@@ -862,11 +899,19 @@ namespace VidyoIntegration.VidyoAddin.ViewModel
                     if (interaction == null)                  throw new ArgumentNullException("interaction");
                     if (string.IsNullOrWhiteSpace(smsNumber)) throw new ArgumentNullException("smsNumber");
 
-                    var builder = new StringBuilder();
+                    var videoUrl  = new Uri(interaction.VidyoRoomUrl);
+                    var portalUrl = new Uri(HttpUtility.ParseQueryString(videoUrl.Query).Get("portalUri"));
+                    var mobileUrl = new Uri(string.Format("vidyomobile://{0}/mobile.html?key={1}", portalUrl.Host, HttpUtility.ParseQueryString(videoUrl.Query).Get("key")));
 
-                    Trace.Main.note("Room: id={}, name={}, extension={}, pin={}", interaction.VidyoRoomId, interaction.VidyoRoomName, interaction.VidyoRoomExtension, interaction.VidyoRoomPin);
-                    builder.AppendLine(message).Append("Room Extension: ").Append(interaction.VidyoRoomExtension).Append(", PIN: ").Append(interaction.VidyoRoomPin);
-                    SendSMS(smsNumber, smsNumber, builder.ToString());
+                    Trace.Main.verbose("Room: id={}, name={}, extension={}, pin={}, portal={}", interaction.VidyoRoomId, interaction.VidyoRoomName, interaction.VidyoRoomExtension, interaction.VidyoRoomPin, portalUrl);
+                    Trace.Main.note("Room: id={}, portal={}, mobile={}", interaction.VidyoRoomId, portalUrl, mobileUrl);
+
+                    var tinyUrlRequest = new Uri(string.Format("http://tinyurl.com/api-create.php?url={0}", mobileUrl));
+                    var tinyUrlService = new System.Net.WebClient();
+
+                    Trace.Main.verbose("Calculating a tiny url at: {}", tinyUrlRequest.ToString());
+                    tinyUrlService.DownloadDataCompleted += OnTinyUrlGenerated;
+                    tinyUrlService.DownloadDataAsync(tinyUrlRequest, new string[] { smsNumber, message, interaction.VidyoRoomPin });
                 }
                 catch (Exception ex)
                 {
